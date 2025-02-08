@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waktu Salat</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+h1, h3 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.results {
+    margin-top: 20px;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+}
+
+#prayerTimesList {
+    list-style-type: none;
+    padding: 0;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Perhitungan Waktu Salat</h1>
+        <form id="prayerForm">
+            <label for="latitude">Lintang (Latitude):</label>
+            <input type="number" id="latitude" step="0.000001" placeholder="Contoh: -6.823" required>
+            <label for="longitude">Bujur (Longitude):</label>
+            <input type="number" id="longitude" step="0.000001" placeholder="Contoh: 107.142" required>
+            <button type="button" id="calculate">Hitung Waktu Salat</button>
+        </form>
+        <div class="results" id="results">
+            <h3>Hasil Perhitungan Waktu Dzuhur:</h3>
+            <ul id="prayerTimesList">
+                <li id="dzuhurTime">Waktu Dzuhur: </li>
+            </ul>
+        </div>
+        
+    </div>
+    <script>
+        // Fungsi utama untuk menghitung waktu Dzuhur
+function hitungWaktuDzuhur(latitude, longitude, ihtiyat = 2) {
+    const now = new Date();
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+
+    // Hitung perata waktu (Equation of Time)
+    const B = ((360 / 365) * (dayOfYear - 81)) * (Math.PI / 180);
+    const perataWaktu = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+    const perataWaktuJam = perataWaktu / 60;
+
+    // Hitung waktu istiwa (tengah hari matahari)
+    const waktuIstiwa = 12 + perataWaktuJam - (longitude - 105) / 15;
+
+    // Penyesuaian untuk zawal (waktu Dzuhur)
+    const waktuDzuhur = waktuIstiwa + (ihtiyat / 60);
+
+    // Konversi waktu Dzuhur ke format jam dan menit
+    const jam = Math.floor(waktuDzuhur);
+    const menit = Math.round((waktuDzuhur - jam) * 60);
+
+    return {
+        jam: jam < 0 ? jam + 24 : jam, // Format 24 jam
+        menit: menit < 10 ? `0${menit}` : menit // Tambahkan leading zero
+    };
+}
+
+// Event listener untuk tombol hitung
+document.getElementById("calculate").addEventListener("click", function () {
+    const latitude = parseFloat(document.getElementById("latitude").value);
+    const longitude = parseFloat(document.getElementById("longitude").value);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+        alert("Masukkan latitude dan longitude dengan benar!");
+        return;
+    }
+
+    // Hitung waktu Dzuhur
+    const hasilDzuhur = hitungWaktuDzuhur(latitude, longitude);
+
+    // Tampilkan hasil di HTML
+    const waktuDzuhurText = `${hasilDzuhur.jam}:${hasilDzuhur.menit}`;
+    document.getElementById("dzuhurTime").innerText = `Waktu Dzuhur: ${waktuDzuhurText}`;
+});
+
+// Secara otomatis isi latitude dan longitude (jika diizinkan)
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+        document.getElementById("latitude").value = position.coords.latitude.toFixed(6);
+        document.getElementById("longitude").value = position.coords.longitude.toFixed(6);
+    }, () => {
+        alert("Gagal mendapatkan lokasi otomatis.");
+    });
+} else {
+    alert("Geolocation tidak didukung oleh browser ini.");
+}
+
+// Isi tanggal, bulan, tahun sekarang otomatis
+const now = new Date();
+document.getElementById("tanggal").value = now.getDate();
+document.getElementById("bulan").value = now.getMonth() + 1;
+document.getElementById("tahun").value = now.getFullYear();
+
+    </script>
+</body>
+</html>

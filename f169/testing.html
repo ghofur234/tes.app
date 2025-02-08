@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Falak Hisab Rukyah</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function toggleButtons() {
+            document.querySelectorAll('.orbit-button').forEach(button => {
+                button.classList.toggle('show');
+            });
+        }
+    </script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            position: relative;
+        }
+        .center-button {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 50%, transparent 40%, rgb(124, 124, 49) 50%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            position: absolute;
+        }
+        .orbit-button {
+            width: 50px;
+            height: 50px;
+            background: rgb(172, 56, 48);
+            border: none;
+            border-radius: 50%;
+            position: absolute;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform: scale(0);
+            opacity: 0;
+        }
+        .orbit-button.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .orbit-button:nth-child(2) { transform: translate(-80px, 0); }
+        .orbit-button:nth-child(3) { transform: translate(80px, 0); }
+        .orbit-button:nth-child(4) { transform: translate(0, -80px); }
+        .orbit-button:nth-child(5) { transform: translate(0, 80px); }
+    </style>
+</head>
+<body>
+    <button class="center-button" onclick="toggleButtons()"></button>
+    <button onclick="location.href='tentang.html'" class="orbit-button">Hitung</button>
+    <button class="orbit-button"></button>
+    <button class="orbit-button"></button>
+    <button class="orbit-button"></button>
+</body>
+</html>
